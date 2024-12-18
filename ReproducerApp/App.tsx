@@ -5,14 +5,12 @@
  * @format
  */
 
-import React, {
-  useEffect, useRef, useState
-} from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useRef, useState} from 'react';
+
 import {
   SafeAreaView,
   View,  FlatList, Text,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 
 
@@ -34,33 +32,30 @@ const Section = (): React.JSX.Element => {
     }
     return returnArray;
   };
-  Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+  Dimensions.addEventListener('change', ({ window: { width, height } }) => {
     if (width < height) {
-      console.log("portrait");
+      console.log('portrait');
       setIsLandscape(false);
     } else {
-      console.log("landscape");
+      console.log('landscape');
       setIsLandscape(true);
     }
   });
-  
+
   const data = buildData();
 
   return (
-  <View
-  className="flex-1"
->
   <FlatList
     ref={fadeFlatListRef}
     initialNumToRender={isLandscape ? 5 : 10}
     viewabilityConfig={{
       waitForInteraction: false,
       minimumViewTime: 10,
-      viewAreaCoveragePercentThreshold: 95
+      viewAreaCoveragePercentThreshold: 95,
     }}
-    onViewableItemsChanged={info => {
-      //setTopViewableIndex(info?.viewableItems[0]?.index ?? 0);
-    }}
+    // onViewableItemsChanged={info => {
+    //   //setTopViewableIndex(info?.viewableItems[0]?.index ?? 0);
+    // }}
     scrollToOverflowEnabled
     keyExtractor={dataItem => dataItem.id.toString()}
     data={data}
@@ -71,9 +66,9 @@ const Section = (): React.JSX.Element => {
     )}
   />
 
-</View>)
+);
 
-}
+};
 
 function App(): React.JSX.Element {
 
