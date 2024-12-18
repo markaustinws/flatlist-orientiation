@@ -5,114 +5,83 @@
  * @format
  */
 
-import React from 'react';
+import React, {
+  useEffect, useRef, useState
+} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+  View,  FlatList, Text,
+  Dimensions
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+type dataType = {
+  id: number;
+  text: string;
+};
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const Section = (): React.JSX.Element => {
+  const fadeFlatListRef = useRef<FlatList<dataType> | null>(null);
+
+  const [isLandscape, setIsLandscape] = useState(false);
+
+  const buildData = () => {
+    const returnArray : dataType[] = [];
+
+    for (let i = 0; i < 100; i++) {
+      returnArray.push({ id: i, text: `item ${i}` });
+    }
+    return returnArray;
+  };
+  Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+    if (width < height) {
+      console.log("portrait");
+      setIsLandscape(false);
+    } else {
+      console.log("landscape");
+      setIsLandscape(true);
+    }
+  });
+  
+  const data = buildData();
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+  <View
+  className="flex-1"
+>
+  <FlatList
+    ref={fadeFlatListRef}
+    initialNumToRender={isLandscape ? 5 : 10}
+    viewabilityConfig={{
+      waitForInteraction: false,
+      minimumViewTime: 10,
+      viewAreaCoveragePercentThreshold: 95
+    }}
+    onViewableItemsChanged={info => {
+      //setTopViewableIndex(info?.viewableItems[0]?.index ?? 0);
+    }}
+    scrollToOverflowEnabled
+    keyExtractor={dataItem => dataItem.id.toString()}
+    data={data}
+    renderItem={dataItem => (
+      <View style={{ height: isLandscape ? 50 : 200 }}>
+        <Text>{dataItem.item.text}</Text>
+      </View>
+    )}
+  />
+
+</View>)
+
 }
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView>
+    <Section/>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
